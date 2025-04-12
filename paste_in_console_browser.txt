@@ -1,0 +1,48 @@
+function simulateRealClick(el) {
+  const rect = el.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
+
+  ['pointerdown', 'mousedown', 'mouseup', 'click'].forEach(type => {
+    const event = new MouseEvent(type, {
+      bubbles: true,
+      cancelable: true,
+      clientX: x,
+      clientY: y,
+      view: window
+    });
+    el.dispatchEvent(event);
+  });
+
+  console.log('✅ Clicked:', el);
+}
+
+// Set buat nyimpen elemen yang udah diklik
+const clicked = new WeakSet();
+
+// Cek dan klik setiap elemen baru dengan delay
+function checkAndClickNew() {
+  document.querySelectorAll('.uranium-shard').forEach(el => {
+    if (!clicked.has(el)) {
+      clicked.add(el);
+
+      setTimeout(() => {
+        simulateRealClick(el);
+      }, 2000); // delay 2 detik
+    }
+  });
+}
+
+// Pantau DOM buat elemen baru
+const observer = new MutationObserver(() => {
+  checkAndClickNew();
+});
+
+// Mulai mantau seluruh dokumen
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+
+// Langsung cek juga pas pertama dijalankan
+checkAndClickNew();
